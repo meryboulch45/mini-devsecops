@@ -23,8 +23,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Run tests
+        run: pytest
+
       - name: Security scan with Bandit
         run: bandit -r . --exclude ./test_app.py
 
-      - name: Run tests
-        run: pytest
+      - name: Build Docker image
+        run: docker build -t devsecops-app .
+
+      
