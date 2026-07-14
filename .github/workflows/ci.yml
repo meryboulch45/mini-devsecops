@@ -30,14 +30,23 @@ jobs:
         run: bandit -r . --exclude ./test_app.py
 
       - name: Build Docker image
-        run: docker build -t devsecops-app .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest .
 
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'devsecops-app'
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
           format: 'table'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
       
